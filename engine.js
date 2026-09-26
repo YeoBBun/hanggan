@@ -64,16 +64,42 @@ async function fetchJSON(path) {
   return res.json();
 }
 
+// index.html에 build.js가 인라인해 둔 데이터가 있으면 그걸 우선 쓴다 —
+// file://로 더블클릭해서 열어도(fetch 불가) 바로 실행되도록.
+// 없으면(=index.html을 직접 손으로 고쳐서 비운 경우) 서버로 띄웠다는 전제로 fetch한다.
+function readInlineJSON(id) {
+  const node = document.getElementById(id);
+  if (!node) return null;
+  const text = node.textContent.trim();
+  if (!text || text === "{}") return null;
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    console.warn(`인라인 데이터(#${id}) 파싱 실패`, e);
+    return null;
+  }
+}
+
 async function boot() {
   try {
-    const [config, chapter, questions] = await Promise.all([
-      fetchJSON("data/config.json"),
-      fetchJSON(`data/${CHAPTER_ID}.json`),
-      fetchJSON("data/questions.json"),
-    ]);
-    CONFIG = config;
-    CHAPTER = chapter;
-    QUESTIONS = questions;
+    const inlineConfig = readInlineJSON("data-config");
+    const inlineChapter = readInlineJSON("data-ch1");
+    const inlineQuestions = readInlineJSON("data-questions");
+
+    if (inlineConfig && inlineChapter && inlineQuestions) {
+      CONFIG = inlineConfig;
+      CHAPTER = inlineChapter;
+      QUESTIONS = inlineQuestions;
+    } else {
+      const [config, chapter, questions] = await Promise.all([
+        fetchJSON("data/config.json"),
+        fetchJSON(`data/${CHAPTER_ID}.json`),
+        fetchJSON("data/questions.json"),
+      ]);
+      CONFIG = config;
+      CHAPTER = chapter;
+      QUESTIONS = questions;
+    }
   } catch (err) {
     document.body.innerHTML =
       '<div style="padding:32px;color:#eee;font-family:sans-serif;line-height:1.6">' +
