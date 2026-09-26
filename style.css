@@ -1,0 +1,337 @@
+@charset "UTF-8";
+
+:root {
+  --panel-bg: rgba(15, 14, 18, 0.86);
+  --panel-border: rgba(255, 255, 255, 0.12);
+  --text-main: #f1ede7;
+  --text-dim: #b9b3ac;
+  --accent: #e8875a;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #0b0a0d;
+  font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Pretendard", sans-serif;
+  color: var(--text-main);
+  overflow: hidden;
+}
+
+#app {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 480px;
+}
+
+/* ---------- 배경(색) ---------- */
+#stage {
+  position: absolute;
+  inset: 0;
+  background-color: #1a1a1f;
+  transition: background-color 0.6s ease;
+}
+
+#stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%);
+  pointer-events: none;
+}
+
+/* ---------- 인물 바 ---------- */
+#char-bar {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  right: 18px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.char-chip {
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+  opacity: 0;
+  transform: translateY(-6px);
+  animation: chip-in 0.35s ease forwards;
+}
+
+@keyframes chip-in {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- 상단 정보(BGM/저장) ---------- */
+#hud {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 6;
+  font-size: 12px;
+  color: var(--text-dim);
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  pointer-events: none;
+}
+
+#bgm-indicator { opacity: 0.8; }
+
+/* ---------- 클릭 캐처 ---------- */
+#click-catcher {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  cursor: pointer;
+}
+
+/* ---------- 대사/독백 박스 ---------- */
+#text-layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  padding: 18px 24px 26px;
+  pointer-events: none;
+}
+
+#dialogue-box {
+  max-width: 760px;
+  margin: 0 auto;
+  min-height: 96px;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  padding: 18px 22px;
+  backdrop-filter: blur(6px);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+#dialogue-box.narr {
+  background: rgba(15, 14, 18, 0.55);
+  border-style: dashed;
+}
+
+#speaker-name {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 3px 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  color: #fff;
+}
+
+#dialogue-box.narr #speaker-name { display: none; }
+
+#dialogue-text {
+  font-size: 18px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  word-break: keep-all;
+}
+
+#dialogue-box.narr #dialogue-text {
+  font-style: italic;
+  color: var(--text-dim);
+  font-size: 16.5px;
+}
+
+#advance-hint {
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--text-dim);
+  text-align: right;
+  opacity: 0.7;
+}
+
+/* ---------- fx 캡션 ---------- */
+#fx-caption {
+  max-width: 420px;
+  margin: 0 auto 14px;
+  text-align: center;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  background: rgba(15,14,18,0.7);
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  padding: 8px 18px;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* ---------- 페이드(암전) ---------- */
+#fade-overlay {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;
+  transition: opacity linear;
+}
+
+/* ---------- 시작 화면 ---------- */
+#start-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  background: radial-gradient(circle at 50% 30%, #2a2430 0%, #0b0a0d 70%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  text-align: center;
+  padding: 24px;
+}
+
+#start-screen h1 {
+  font-size: 40px;
+  letter-spacing: 0.25em;
+  margin: 0;
+  font-weight: 300;
+}
+
+#start-screen p {
+  color: var(--text-dim);
+  margin: 0;
+  max-width: 420px;
+  line-height: 1.6;
+}
+
+.btn {
+  appearance: none;
+  border: 1px solid var(--panel-border);
+  background: rgba(255,255,255,0.06);
+  color: var(--text-main);
+  font-size: 15px;
+  padding: 12px 26px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn:hover { background: rgba(255,255,255,0.14); }
+.btn:active { transform: scale(0.97); }
+
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #1a1108;
+  font-weight: 700;
+}
+
+.btn.primary:hover { background: #f09b71; }
+
+.start-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+/* ---------- 문항 오버레이 ---------- */
+#question-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  background: rgba(6, 5, 8, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+#question-card {
+  width: 100%;
+  max-width: 620px;
+  background: #17151b;
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  padding: 26px 28px;
+}
+
+#question-stage-label {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+#question-prompt {
+  font-size: 19px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.q-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.q-option {
+  text-align: left;
+  padding: 13px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--panel-border);
+  background: rgba(255,255,255,0.04);
+  color: var(--text-main);
+  font-size: 15px;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.q-option:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); }
+.q-option.selected { border-color: var(--accent); background: rgba(232,135,90,0.14); }
+
+.q-feedback {
+  margin-top: 18px;
+  padding: 16px 18px;
+  border-radius: 10px;
+  background: rgba(232,135,90,0.08);
+  border: 1px solid rgba(232,135,90,0.35);
+}
+
+.q-feedback .who {
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 6px;
+  display: block;
+  font-size: 13px;
+}
+
+.q-feedback .text {
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.q-actions {
+  margin-top: 18px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+@media (max-width: 560px) {
+  #start-screen h1 { font-size: 30px; letter-spacing: 0.15em; }
+  #dialogue-text { font-size: 16.5px; }
+  #question-card { padding: 20px 18px; }
+}

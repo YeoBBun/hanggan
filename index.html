@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>행간</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="app">
+  <div id="stage"></div>
+  <div id="char-bar"></div>
+  <div id="hud"><span id="bgm-indicator"></span></div>
+  <div id="click-catcher"></div>
+
+  <div id="text-layer">
+    <div id="fx-caption" style="display:none"></div>
+    <div id="dialogue-box" style="display:none">
+      <span id="speaker-name"></span>
+      <div id="dialogue-text"></div>
+      <div id="advance-hint">클릭해서 계속</div>
+    </div>
+  </div>
+
+  <div id="fade-overlay"></div>
+
+  <div id="question-overlay" style="display:none">
+    <div id="question-card"></div>
+  </div>
+
+  <div id="start-screen">
+    <h1>행間</h1>
+    <p>4층 끝, 아무도 모르는 이름의 동아리.<br />1막 1챕터 프로토타입</p>
+    <div class="start-actions">
+      <button id="continue-btn" class="btn primary" type="button">이어하기</button>
+      <button id="restart-btn" class="btn" type="button">처음부터</button>
+    </div>
+  </div>
+</div>
+<script src="engine.js"></script>
+</body>
+</html>
