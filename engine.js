@@ -135,6 +135,11 @@ async function boot() {
 function startGame(resume) {
   el.startScreen.style.display = "none";
   el.app.classList.add("running");
+  // 시작 화면 버튼이 포커스를 들고 있으면 스페이스/엔터가 버튼을 다시
+  // 눌러버려서(재시작 반복) 대사가 안 넘어가는 것처럼 보인다 — 포커스를 뗀다.
+  if (document.activeElement && document.activeElement.blur) {
+    document.activeElement.blur();
+  }
 
   chapterIndex = CHAPTER_IDS.indexOf(state.chapter);
   if (chapterIndex < 0) chapterIndex = 0;
