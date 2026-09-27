@@ -1,7 +1,7 @@
 "use strict";
 
 const SAVE_KEY = "hanggan_save";
-const CHAPTER_ID = "ch1";
+const CHAPTER_IDS = ["ch1", "ch2", "ch3", "ch4"];
 
 const el = {
   app: document.getElementById("app"),
@@ -23,11 +23,11 @@ const el = {
 };
 
 let CONFIG = null;
-let CHAPTER = null;
+let CHAPTERS = {}; // id -> chapter data
 let QUESTIONS = null;
 
 let state = {
-  chapter: CHAPTER_ID,
+  chapter: CHAPTER_IDS[0],
   beat: null,
   line: 0,
   bonus: [],
@@ -43,7 +43,7 @@ function loadSave() {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    if (parsed && parsed.chapter === CHAPTER_ID) return parsed;
+    if (parsed && CHAPTER_IDS.includes(parsed.chapter)) return parsed;
     return null;
   } catch (e) {
     return null;
@@ -83,22 +83,22 @@ function readInlineJSON(id) {
 async function boot() {
   try {
     const inlineConfig = readInlineJSON("data-config");
-    const inlineChapter = readInlineJSON("data-ch1");
     const inlineQuestions = readInlineJSON("data-questions");
+    const inlineChapters = CHAPTER_IDS.map((id) => readInlineJSON(`data-${id}`));
 
-    if (inlineConfig && inlineChapter && inlineQuestions) {
+    if (inlineConfig && inlineQuestions && inlineChapters.every(Boolean)) {
       CONFIG = inlineConfig;
-      CHAPTER = inlineChapter;
       QUESTIONS = inlineQuestions;
+      CHAPTER_IDS.forEach((id, i) => (CHAPTERS[id] = inlineChapters[i]));
     } else {
-      const [config, chapter, questions] = await Promise.all([
+      const [config, questions, ...chapters] = await Promise.all([
         fetchJSON("data/config.json"),
-        fetchJSON(`data/${CHAPTER_ID}.json`),
         fetchJSON("data/questions.json"),
+        ...CHAPTER_IDS.map((id) => fetchJSON(`data/${id}.json`)),
       ]);
       CONFIG = config;
-      CHAPTER = chapter;
       QUESTIONS = questions;
+      CHAPTER_IDS.forEach((id, i) => (CHAPTERS[id] = chapters[i]));
     }
   } catch (err) {
     document.body.innerHTML =
@@ -116,7 +116,7 @@ async function boot() {
     el.continueBtn.style.display = "";
     el.continueBtn.onclick = () => {
       state = Object.assign(
-        { chapter: CHAPTER_ID, beat: null, line: 0, bonus: [], seen: [] },
+        { chapter: CHAPTER_IDS[0], beat: null, line: 0, bonus: [], seen: [] },
         save
       );
       startGame(true);
@@ -127,7 +127,7 @@ async function boot() {
 
   el.restartBtn.onclick = () => {
     localStorage.removeItem(SAVE_KEY);
-    state = { chapter: CHAPTER_ID, beat: null, line: 0, bonus: [], seen: [] };
+    state = { chapter: CHAPTER_IDS[0], beat: null, line: 0, bonus: [], seen: [] };
     startGame(false);
   };
 }
@@ -136,8 +136,12 @@ function startGame(resume) {
   el.startScreen.style.display = "none";
   el.app.classList.add("running");
 
+  chapterIndex = CHAPTER_IDS.indexOf(state.chapter);
+  if (chapterIndex < 0) chapterIndex = 0;
+
+  const chapterData = CHAPTERS[CHAPTER_IDS[chapterIndex]];
   if (resume && state.beat) {
-    beatIndex = CHAPTER.beats.findIndex((b) => b.id === state.beat);
+    beatIndex = chapterData.beats.findIndex((b) => b.id === state.beat);
     if (beatIndex < 0) beatIndex = 0;
   } else {
     beatIndex = 0;
@@ -150,6 +154,7 @@ function startGame(resume) {
   runFrom(beatIndex, state.line || 0);
 }
 
+let chapterIndex = 0;
 let currentBeat = null;
 let currentLineIdx = 0;
 let waitingForClick = false;
@@ -157,11 +162,13 @@ let waitingForClick = false;
 function runFrom(bIdx, lIdx) {
   beatIndex = bIdx;
   currentLineIdx = lIdx;
-  currentBeat = CHAPTER.beats[beatIndex];
+  const chapterData = CHAPTERS[CHAPTER_IDS[chapterIndex]];
+  currentBeat = chapterData.beats[beatIndex];
   if (!currentBeat) {
     showEnding();
     return;
   }
+  state.chapter = CHAPTER_IDS[chapterIndex];
   state.beat = currentBeat.id;
   state.line = currentLineIdx;
   stepLoop();
@@ -185,15 +192,23 @@ async function stepLoop() {
   while (true) {
     if (!currentBeat) return;
     if (currentLineIdx >= currentBeat.lines.length) {
-      // 비트 종료 → 다음 비트로
+      // 비트 종료 → 다음 비트로 (챕터 끝나면 다음 챕터로)
       if (!state.seen.includes(currentBeat.id)) state.seen.push(currentBeat.id);
       writeSave();
       beatIndex += 1;
-      currentBeat = CHAPTER.beats[beatIndex];
+      let chapterData = CHAPTERS[CHAPTER_IDS[chapterIndex]];
+      currentBeat = chapterData.beats[beatIndex];
       currentLineIdx = 0;
       if (!currentBeat) {
-        showEnding();
-        return;
+        chapterIndex += 1;
+        beatIndex = 0;
+        chapterData = CHAPTERS[CHAPTER_IDS[chapterIndex]];
+        if (!chapterData) {
+          showEnding();
+          return;
+        }
+        currentBeat = chapterData.beats[0];
+        state.chapter = CHAPTER_IDS[chapterIndex];
       }
       state.beat = currentBeat.id;
       state.line = 0;
@@ -335,7 +350,7 @@ async function renderFx(line) {
 
 function showEnding() {
   el.dialogueBox.classList.add("narr");
-  el.dialogueText.textContent = "— 1챕터 끝 —";
+  el.dialogueText.textContent = "— 1막 끝 —";
   el.fxCaption.style.display = "none";
   el.dialogueBox.style.display = "";
   waitingForClick = false;

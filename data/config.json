@@ -1,20 +1,49 @@
 {
   "chars": {
-    "도윤":   { "color": "#4a5a6b", "sprite": null },
-    "하린":   { "color": "#7d6b8f", "sprite": null },
-    "민아":   { "color": "#c08a5a", "sprite": null },
-    "태경":   { "color": "#5a8f7d", "sprite": null },
-    "선생님": { "color": "#888888", "sprite": null },
-    "남학생A": { "color": "#7a7a7a", "sprite": null }
+    "도윤":     { "color": "#4a5a6b", "sprite": null },
+    "하린":     { "color": "#7d6b8f", "sprite": null },
+    "민아":     { "color": "#c08a5a", "sprite": null },
+    "태경":     { "color": "#5a8f7d", "sprite": null },
+    "선생님":   { "color": "#888888", "sprite": null },
+    "지원":     { "color": "#7f9db0", "sprite": null },
+    "남학생A":  { "color": "#7a7a7a", "sprite": null },
+    "3학년A":   { "color": "#9a8368", "sprite": null },
+    "3학년B":   { "color": "#9a8368", "sprite": null },
+    "독토부장": { "color": "#8a9b6e", "sprite": null },
+    "학생A":    { "color": "#7a7a7a", "sprite": null },
+    "학생B":    { "color": "#7a7a7a", "sprite": null },
+    "학생C":    { "color": "#7a7a7a", "sprite": null },
+    "학생D":    { "color": "#7a7a7a", "sprite": null },
+    "학생E":    { "color": "#7a7a7a", "sprite": null },
+    "학생F":    { "color": "#7a7a7a", "sprite": null }
   },
   "bg": {
-    "복도_게시판":  "#c9c2b3",
-    "도윤방_저녁":  "#7a6a58",
-    "도윤방_밤":    "#232838",
-    "복도_4층":    "#cfcabb",
-    "부실_낮":     "#dfe6d0",
-    "부실_방과후":  "#e0cfa0",
-    "부실_저녁":   "#d68a56",
-    "교문_노을":   "#e8875a"
+    "복도_게시판":   "#c9c2b3",
+    "도윤방_저녁":   "#7a6a58",
+    "도윤방_밤":     "#232838",
+    "복도_4층":     "#cfcabb",
+    "부실_낮":      "#dfe6d0",
+    "부실_방과후":   "#e0cfa0",
+    "부실_저녁":    "#d68a56",
+    "교문_노을":    "#e8875a",
+
+    "부실_오후":     "#e3d9b8",
+    "복도_3층창가":  "#c7d2c0",
+    "행정실앞복도":  "#cac2b0",
+    "분식집_저녁":   "#e0a15c",
+    "부실_밤":      "#26232c",
+    "매점앞":       "#e8c98a",
+    "빈교실":       "#cfd6da",
+    "교무실":       "#cdbfa9",
+
+    "하굣길_노을":   "#e79a63",
+    "복도_방과후":   "#c9c3ae",
+    "학교뒤편계단":  "#d7c9a8",
+    "하굣길":       "#b9ab8e",
+    "국어교과실":    "#8a9bb0",
+
+    "교실_아침":     "#f0e6c8",
+    "독서토론부실":  "#d8e0c0",
+    "복도_나오는길": "#c7c2b3"
   }
 }

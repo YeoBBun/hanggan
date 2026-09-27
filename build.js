@@ -16,6 +16,9 @@ const HTML_PATH = path.join(ROOT, "index.html");
 const SOURCES = {
   "data-config": "data/config.json",
   "data-ch1": "data/ch1.json",
+  "data-ch2": "data/ch2.json",
+  "data-ch3": "data/ch3.json",
+  "data-ch4": "data/ch4.json",
   "data-questions": "data/questions.json",
 };
 
