@@ -151,7 +151,16 @@ function startGame(resume) {
   el.clickCatcher.addEventListener("click", onAdvanceClick);
   el.dialogueBox.addEventListener("click", onAdvanceClick);
   el.fxCaption.addEventListener("click", onAdvanceClick);
+  document.addEventListener("keydown", onAdvanceKey);
   runFrom(beatIndex, state.line || 0);
+}
+
+function onAdvanceKey(e) {
+  if (e.key !== "Enter" && e.key !== " " && e.code !== "Space") return;
+  // 문항 화면에서는 버튼 포커스로 선택하는 것과 겹치지 않게 무시
+  if (el.questionOverlay.style.display !== "none") return;
+  e.preventDefault();
+  onAdvanceClick();
 }
 
 let chapterIndex = 0;
