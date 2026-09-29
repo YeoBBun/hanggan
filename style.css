@@ -330,8 +330,106 @@ html, body {
   justify-content: flex-end;
 }
 
+/* ---------- 문서(doc) 전체화면 ---------- */
+#doc-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  background: rgba(6, 5, 8, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+#doc-card {
+  width: 100%;
+  max-width: 640px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: #17151b;
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  padding: 28px 30px;
+}
+
+.doc-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.doc-subtitle {
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-bottom: 18px;
+}
+
+.doc-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.doc-line { margin: 0; }
+
+.doc-who {
+  display: block;
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 12.5px;
+  margin-bottom: 2px;
+}
+
+.doc-emphasis {
+  font-weight: 700;
+  padding: 8px 12px;
+  background: rgba(232,135,90,0.1);
+  border-left: 3px solid var(--accent);
+  border-radius: 4px;
+}
+
+.doc-handwritten {
+  font-style: italic;
+}
+
+.doc-result {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--panel-border);
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+.doc-byline {
+  margin-top: 14px;
+  text-align: right;
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+/* 문항 카드 안에 축소해서 넣는 참고자료 */
+.doc-ref-box {
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border: 1px dashed var(--panel-border);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.doc-ref-box .doc-title { font-size: 14px; }
+.doc-ref-box .doc-subtitle { font-size: 12px; margin-bottom: 10px; }
+.doc-ref-box .doc-body { font-size: 13px; gap: 8px; }
+.doc-ref-box .doc-result { font-size: 12.5px; margin-top: 10px; padding-top: 10px; }
+
 @media (max-width: 560px) {
   #start-screen h1 { font-size: 30px; letter-spacing: 0.15em; }
   #dialogue-text { font-size: 16.5px; }
   #question-card { padding: 20px 18px; }
+  #doc-card { padding: 20px 18px; }
 }

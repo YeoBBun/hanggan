@@ -20,11 +20,14 @@ const el = {
   restartBtn: document.getElementById("restart-btn"),
   questionOverlay: document.getElementById("question-overlay"),
   questionCard: document.getElementById("question-card"),
+  docOverlay: document.getElementById("doc-overlay"),
+  docCard: document.getElementById("doc-card"),
 };
 
 let CONFIG = null;
 let CHAPTERS = {}; // id -> chapter data
 let QUESTIONS = null;
+let DOCUMENTS = null;
 
 let state = {
   chapter: CHAPTER_IDS[0],
@@ -84,20 +87,24 @@ async function boot() {
   try {
     const inlineConfig = readInlineJSON("data-config");
     const inlineQuestions = readInlineJSON("data-questions");
+    const inlineDocuments = readInlineJSON("data-documents");
     const inlineChapters = CHAPTER_IDS.map((id) => readInlineJSON(`data-${id}`));
 
-    if (inlineConfig && inlineQuestions && inlineChapters.every(Boolean)) {
+    if (inlineConfig && inlineQuestions && inlineDocuments && inlineChapters.every(Boolean)) {
       CONFIG = inlineConfig;
       QUESTIONS = inlineQuestions;
+      DOCUMENTS = inlineDocuments;
       CHAPTER_IDS.forEach((id, i) => (CHAPTERS[id] = inlineChapters[i]));
     } else {
-      const [config, questions, ...chapters] = await Promise.all([
+      const [config, questions, documents, ...chapters] = await Promise.all([
         fetchJSON("data/config.json"),
         fetchJSON("data/questions.json"),
+        fetchJSON("data/documents.json"),
         ...CHAPTER_IDS.map((id) => fetchJSON(`data/${id}.json`)),
       ]);
       CONFIG = config;
       QUESTIONS = questions;
+      DOCUMENTS = documents;
       CHAPTER_IDS.forEach((id, i) => (CHAPTERS[id] = chapters[i]));
     }
   } catch (err) {
@@ -264,9 +271,98 @@ async function renderLine(line) {
       return await renderFx(line);
     case "q":
       return await runQuestion(line.id);
+    case "doc":
+      return await runDoc(line.v);
     default:
       return false;
   }
+}
+
+function findDoc(id) {
+  return (DOCUMENTS && DOCUMENTS[id]) || null;
+}
+
+// 문서 내용을 컨테이너에 채운다 — 전체화면 오버레이(runDoc)와
+// 문항 카드 안의 축소 참고자료 블록(renderDocRef) 양쪽에서 재사용한다.
+function fillDocInto(container, doc) {
+  container.innerHTML = "";
+  if (!doc) return;
+
+  const title = document.createElement("div");
+  title.className = "doc-title";
+  title.textContent = doc.title || "";
+  container.appendChild(title);
+
+  if (doc.subtitle) {
+    const sub = document.createElement("div");
+    sub.className = "doc-subtitle";
+    sub.textContent = doc.subtitle;
+    container.appendChild(sub);
+  }
+
+  const body = document.createElement("div");
+  body.className = "doc-body";
+  if (doc.body) {
+    doc.body.forEach((line) => {
+      const p = document.createElement("p");
+      p.className = "doc-line";
+      const who = document.createElement("span");
+      who.className = "doc-who";
+      who.textContent = line.who;
+      p.appendChild(who);
+      p.appendChild(document.createTextNode(line.text));
+      body.appendChild(p);
+    });
+  } else if (doc.paragraphs) {
+    doc.paragraphs.forEach((text, i) => {
+      const p = document.createElement("p");
+      p.className = "doc-line";
+      if (doc.emphasisLast && i === doc.paragraphs.length - 1) {
+        p.classList.add("doc-emphasis");
+      }
+      p.textContent = text;
+      body.appendChild(p);
+    });
+  }
+  if (doc.style === "handwritten") body.classList.add("doc-handwritten");
+  container.appendChild(body);
+
+  if (doc.result) {
+    const result = document.createElement("div");
+    result.className = "doc-result";
+    result.textContent = doc.result;
+    container.appendChild(result);
+  }
+  if (doc.byline) {
+    const byline = document.createElement("div");
+    byline.className = "doc-byline";
+    byline.textContent = doc.byline;
+    container.appendChild(byline);
+  }
+}
+
+function runDoc(id) {
+  return new Promise((resolve) => {
+    const doc = findDoc(id);
+    if (!doc) {
+      resolve(false);
+      return;
+    }
+    el.docOverlay.style.display = "flex";
+    fillDocInto(el.docCard, doc);
+    const actions = document.createElement("div");
+    actions.className = "q-actions";
+    const closeBtn = document.createElement("button");
+    closeBtn.type = "button";
+    closeBtn.className = "btn primary";
+    closeBtn.textContent = "닫기";
+    closeBtn.onclick = () => {
+      el.docOverlay.style.display = "none";
+      resolve(false);
+    };
+    actions.appendChild(closeBtn);
+    el.docCard.appendChild(actions);
+  });
 }
 
 function applyBg(key) {
@@ -394,10 +490,24 @@ function runQuestion(id) {
     let attempt = 1;
     let stage1Choice = null;
 
+    function renderDocRef(card) {
+      if (!q.doc) return;
+      const ids = Array.isArray(q.doc) ? q.doc : [q.doc];
+      ids.forEach((id) => {
+        const doc = findDoc(id);
+        if (!doc) return;
+        const box = document.createElement("div");
+        box.className = "doc-ref-box";
+        fillDocInto(box, doc);
+        card.appendChild(box);
+      });
+    }
+
     function renderStage1() {
       el.questionOverlay.style.display = "flex";
       const card = el.questionCard;
       card.innerHTML = "";
+      renderDocRef(card);
 
       const label = document.createElement("div");
       label.id = "question-stage-label";
@@ -428,6 +538,7 @@ function runQuestion(id) {
     function renderStage2() {
       const card = el.questionCard;
       card.innerHTML = "";
+      renderDocRef(card);
 
       const label = document.createElement("div");
       label.id = "question-stage-label";
